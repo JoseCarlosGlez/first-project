@@ -1,6 +1,7 @@
 package com.MDF.firstRestApi.My_first_app.services.serviceImpl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,14 @@ public class CourseServiceImpl implements ICourseService {
 	public Course saveCourse(Course course) {
 		// TODO Auto-generated method stub
 
-		if (courseList.isEmpty()) {
-			course.setId(1);
-		} else {
+		if (!courseList.isEmpty()) {
 			course.setId(courseList.get(courseList.size() - 1).getId() + 1);
 		}
+
 		if (courseList.stream().filter(_course -> _course.getName().equals(course.getName())).findFirst().isPresent()) {
 			throw new CourseApiException(HttpStatus.BAD_REQUEST, "The course already exist");
 		}
+
 		this.courseList.add(course);
 		return course;
 	}
@@ -40,7 +41,9 @@ public class CourseServiceImpl implements ICourseService {
 					"it's neccessary the 'Coursename' param to execute the search");
 		}
 
-		return this.courseList.stream().filter(_course -> _course.getName().contains(name)).findFirst().orElseThrow(
+		return this.courseList.stream().filter(_course -> _course.getName().contains(name))
+				.findFirst()
+				.orElseThrow(
 				() -> new CourseApiException(HttpStatus.BAD_REQUEST, "Did not find course with the name provided"));
 
 	}
@@ -49,15 +52,30 @@ public class CourseServiceImpl implements ICourseService {
 	public List<Course> getAllCourses(int from, int limit) {
 		// TODO Auto-generated method stub
 		return this.courseList.stream()
-				.skip(from)
-				.limit(limit)
-				.toList();
+								.sorted(Comparator.comparingLong(Course::getId))
+								.skip(from)
+								.limit(limit)
+								.toList();
+								
 	}
-
+	
 	@Override
-	public Course updateCourse(Course course) {
+	public List<Course> updateCourse(Course course, Long id) {
 		// TODO Auto-generated method stub
-		return null;
+		Course findCourse = this.courseList.stream()
+						.filter(_course->_course.getId() == id)
+						.findFirst()
+						.orElseThrow(()-> new CourseApiException(HttpStatus.BAD_REQUEST, "The course with ID" + id + " does not exist" ));
+
+		 this.courseList.remove(findCourse);
+		 
+		 Course courseUpdated = new Course(course.getName(), course.getAuthor());
+		 
+		 courseUpdated.setId(findCourse.getId());
+ 
+		 this.courseList.add(courseUpdated);
+		 
+		 return this.getAllCourses((int)courseUpdated.getId(), 20);
 	}
 
 	@Override
