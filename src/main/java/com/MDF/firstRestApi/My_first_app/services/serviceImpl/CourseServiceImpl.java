@@ -5,10 +5,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.MDF.firstRestApi.My_first_app.exception.CourseApiException;
 import com.MDF.firstRestApi.My_first_app.models.Course;
+import com.MDF.firstRestApi.My_first_app.payloads.ApiResponse;
 import com.MDF.firstRestApi.My_first_app.services.ICourseService;
 
 @Component
@@ -17,7 +19,7 @@ public class CourseServiceImpl implements ICourseService {
 	private List<Course> courseList = new ArrayList<>();
 
 	@Override
-	public Course saveCourse(Course course) {
+	public ResponseEntity<ApiResponse> saveCourse(Course course) {
 		// TODO Auto-generated method stub
 
 		if (!courseList.isEmpty()) {
@@ -29,7 +31,7 @@ public class CourseServiceImpl implements ICourseService {
 		}
 
 		this.courseList.add(course);
-		return course;
+		return new ResponseEntity<ApiResponse>(new ApiResponse(true, "The course was created correctly"),HttpStatus.CREATED );
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.MDF.firstRestApi.My_first_app.models.Course;
+import com.MDF.firstRestApi.My_first_app.payloads.ApiResponse;
 import com.MDF.firstRestApi.My_first_app.services.ICourseService;
 
 @RestController
@@ -25,8 +26,8 @@ public class CourseController {
 	private ICourseService _courseService;
 
 	@PostMapping
-	public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-		return new ResponseEntity<>(this._courseService.saveCourse(course), HttpStatus.CREATED);
+	public ResponseEntity<ApiResponse> createCourse(@RequestBody Course course) {
+		return this._courseService.saveCourse(course);
 	}
 
 	@GetMapping
